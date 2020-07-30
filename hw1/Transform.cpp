@@ -6,7 +6,7 @@
 
 const mat3 identityMatrix = mat3(1, 0, 0, 0, 1, 0, 0, 0, 1);
 
-float to_radians(float degrees) {
+float toRadians(float degrees) {
     return degrees * (M_PI / 180.0f);
 }
 
@@ -15,7 +15,7 @@ float to_radians(float degrees) {
 // Helper rotation function.  
 mat3 Transform::rotate(const float degrees, const vec3& axis) {
 	// YOUR CODE FOR HW1 HERE
-	float radians = to_radians(degrees);
+	float radians = toRadians(degrees);
 	float x = axis.x;
     float y= axis.y;
     float z= axis.z;
@@ -74,7 +74,7 @@ mat4 Transform::lookAt(vec3 eye, vec3 up) {
 	// 1. compute CF
 	// 2. Apply translation
     vec3 w = glm::normalize(eye);
-    vec3 u = glm::cross(up, w);
+    vec3 u = glm::normalize(glm::cross(up, w));
     vec3 v = glm::cross(w, u);
     mat4 rotationMatrix = mat4(
         u.x, v.x, w.x, 0,
