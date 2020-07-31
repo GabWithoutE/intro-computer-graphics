@@ -192,7 +192,10 @@ void readfile(const char* filename)
 
             vec3 eyeDirection = center - eyeinit; // vector from eye position to center
 
-            upinit = Transform::upvector(vec3(values[6], values[7], values[8]), eyeDirection); // properly orthogonal normalized up vector
+            upinit = Transform::upvector(
+              normalize(vec3(values[6], values[7], values[8])),
+              eyeDirection
+            ); // properly orthogonal normalized up vector
 
             fovy = values[9];
           }
@@ -270,9 +273,7 @@ void readfile(const char* filename)
             // Note that rotate returns a mat3. 
             // Also keep in mind what order your matrix is!
 
-            vec3 axis = vec3(values[0], values[1], values[2]);
-
-            // mat4 supposedly will homogenize the mat3 returned from Transform::rotate
+            vec3 axis = normalize(vec3(values[0], values[1], values[2]));
             rightmultiply(mat4(Transform::rotate(values[3], axis)), transfstack);
           }
         }

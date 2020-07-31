@@ -54,8 +54,8 @@ vec4 ComputeLight (
 
 void main (void) 
 {       
-    if (enablelighting) {       
-        vec4 finalcolor;
+    if (enablelighting) {
+        vec4 finalcolor = vec4(0, 0, 0, 0);
 
         // YOUR CODE FOR HW 2 HERE
         // A key part is implementation of the fragment shader
@@ -70,22 +70,22 @@ void main (void)
         vec4 _normal = transpose(inverse(modelview)) * vec4(mynormal, 1);
         vec3 normal = normalize(_normal.xyz / _normal.w);
 
-        for (int currentlight = 0; currentlight < numLights; currentlight++){
-            vec4 lightpos = lightposn[currentlight]; // position of the light currently being iterated over
+        for (int i = 0; i < numused; i++){
+            vec4 lightpos = lightposn[i]; // position of the light currently being iterated over
 
             vec3 lightdirdhom; // dehomogenized light direction
             if (lightpos.w != 0) {
                 vec3 lightposdhom = lightpos.xyz / lightpos.w; // dehomogenized
                 lightdirdhom = normalize(lightposdhom - vertexpos);
             } else {
-                lightdirdhom = lightpos.xyz;
+                lightdirdhom = normalize(lightpos.xyz);
             }
 
             vec3 halfvec = normalize(lightdirdhom + eyedir); // dehomogenized halfvec for use in ComputeLight
 
             vec4 color = ComputeLight(
                 lightdirdhom,
-                lightcolor[currentlight],
+                lightcolor[i],
                 normal,
                 halfvec,
                 diffuse,

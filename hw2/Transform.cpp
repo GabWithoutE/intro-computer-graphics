@@ -9,7 +9,7 @@
 const mat3 identityMatrix = mat3(1, 0, 0, 0, 1, 0, 0, 0, 1);
 
 float toRadians(float degrees) {
-  return degrees * (M_PI / 180.0f);
+  return degrees * (pi / 180);
 }
 
 // Helper rotation function.  Please implement this.  
@@ -18,6 +18,8 @@ mat3 Transform::rotate(const float degrees, const vec3& axis)
   // YOUR CODE FOR HW2 HERE
   // Please implement this.  Likely the same as in HW 1.
   float radians = toRadians(degrees);
+  vec3 normAxis = normalize(axis);
+
   float x = axis.x;
   float y= axis.y;
   float z= axis.z;
@@ -100,7 +102,7 @@ mat4 Transform::perspective(float fovy, float aspect, float zNear, float zFar)
   // YOUR CODE FOR HW2 HERE
   // New, to implement the perspective transform as well.
   float a = -(zFar + zNear)/(zFar - zNear);
-  float b = -2 * (zFar * zNear)/(zFar - zNear);
+  float b = -(2 * zFar * zNear)/(zFar - zNear);
   float d = 1/tan(toRadians(fovy) / 2);
 
   return mat4(
@@ -111,7 +113,8 @@ mat4 Transform::perspective(float fovy, float aspect, float zNear, float zFar)
     );
 
   // for testing
-  return glm::perspective(fovy, aspect, zNear, zFar);
+//  return glm::perspective(fovy, aspect, zNear, zFar);
+//  return glm::perspective(fovy, aspect, zNear, zFar);
 }
 
 mat4 Transform::scale(const float &sx, const float &sy, const float &sz) 
