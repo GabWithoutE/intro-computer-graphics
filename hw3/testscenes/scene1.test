@@ -1,7 +1,8 @@
 # Test Scene 1 
 # A simple quad viewed from different camera positions
 
-size 640 480 
+size 640 480
+output scene1-test.png
 
 # Now specify the camera.  This is what you should implement.
 # This file has 4 camera positions.  Render your scene for all 4.
@@ -36,4 +37,3 @@ vertex -1 +1 0
 
 tri 0 1 2
 tri 0 2 3
-
