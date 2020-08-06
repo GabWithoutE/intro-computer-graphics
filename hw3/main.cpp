@@ -13,26 +13,20 @@
 #include <stack>
 #include "Transform.h"
 #include <FreeImage.h>
-#include "UCSD/grader.h"
 
 using namespace std; 
 
 // Main variables in the program.  
 #define MAINPROGRAM 
 #include "variables.h" 
-#include "readfile.h" // prototypes for readfile.cpp  
+#include "readfile.h" // prototypes for readfile.cpp
 
-void saveScreenshot(string fname) {
-  int pix = w * h;
-  BYTE *pixels = new BYTE[3*pix];	
-  glReadBuffer(GL_FRONT);
-  glReadPixels(0,0,w,h,GL_BGR,GL_UNSIGNED_BYTE, pixels);
-
+void saveScreenshot(BYTE * pixels, string outputfilename) {
   FIBITMAP *img = FreeImage_ConvertFromRawBits(pixels, w, h, w * 3, 24, 0xFF0000, 0x00FF00, 0x0000FF, false);
 
-  std::cout << "Saving screenshot: " << fname << "\n";
+  std::cout << "Saving screenshot: " << outputfilename << "\n";
 
-  FreeImage_Save(FIF_PNG, img, fname.c_str(), 0);
+  FreeImage_Save(FIF_PNG, img, outputfilename.c_str(), 0);
   delete[] pixels;
 }
 
@@ -40,6 +34,23 @@ void init() {
 
 }
 
-int main(int argc, char* argv[]) {
+void trackProgress(int totalpixels, int * currentpixel) {
+  int currentprogress = (*currentpixel / totalpixels) * 100; // current progress in percent
+  printf("Done %i %%\n", currentprogress);
+}
 
+int main(int argc, char* argv[]) {
+  BYTE *pixels = new BYTE[3*totalpixels];
+  readfile(argv[1]);
+
+  FreeImage_Initialise();
+
+  if (fname.empty()) {
+    saveScreenshot(pixels, "Untitled.png");
+  } else {
+    saveScreenshot(pixels, fname);
+  }
+
+  FreeImage_DeInitialise();
+  return 0;
 }

@@ -27,26 +27,17 @@
 #include <sstream>
 #include <deque>
 #include <stack>
-#ifdef __APPLE__
-#include <OpenGL/gl3.h>
-#include <OpenGL/glext.h>
-#include <GLUT/glut.h>
-#else
-#include <GL/glew.h>
-#include <GL/glut.h>
-#endif
-#include "Transform.h" 
+#include "Transform.h"
 
 using namespace std;
 #include "variables.h"
 #include "readfile.h"
 
-
 // You may not need to use the following two functions, but it is provided
 // here for convenience
 
 // The function below applies the appropriate transform to a 4-vector
-void matransform(stack<mat4> &transfstack, GLfloat* values) 
+void matransform(stack<mat4> &transfstack, float* values)
 {
   mat4 transform = transfstack.top(); 
   vec4 valvec = vec4(values[0],values[1],values[2],values[3]); 
@@ -62,16 +53,43 @@ void rightmultiply(const mat4 & M, stack<mat4> &transfstack)
 
 // Function to read the input data values
 // Use is optional, but should be very helpful in parsing.  
-bool readvals(stringstream &s, const int numvals, GLfloat* values) 
+bool readvals(stringstream &s, const int numvals, float* values)
 {
   for (int i = 0; i < numvals; i++) {
-    s >> values[i]; 
+    s >> values[i];
     if (s.fail()) {
-      cout << "Failed reading value " << i << " will skip\n"; 
+      cout << "Failed reading value " << i << " will skip\n";
       return false;
     }
   }
   return true; 
+}
+
+bool readvals(stringstream &s, int numvals, float* values, string caller)
+{
+  for (int i = 0; i < numvals; i++) {
+    s >> values[i];
+//    cout << "caller: " << caller << " value: " << values[i] << "\n";
+    if (s.fail()) {
+      cout << "Failed reading value " << i << " " << caller << " will skip\n";
+      return false;
+    }
+  }
+  return true;
+}
+void readlightvals(stringstream &s, int * numused, float * values, light type, string caller) {
+  bool validinput = readvals(s, 6, values, caller);
+  if (validinput) {
+    // NOTE: the number of values per light is hardcoded in variables.h. in raytracer, we have is 3 point
+    //  values for position and color RGB and not RBGA
+    lighttype[*numused] = type; // set the type to either point or directional
+
+    for (int i = 0; i < 3; i++) {
+      lightposn[i + 3 * *numused] = values[i];
+      lightcolor[i + 3 * *numused] = values[i + 3];
+    }
+  }
+  (*numused)++;
 }
 
 void readfile(const char* filename) 
@@ -94,103 +112,84 @@ void readfile(const char* filename)
         stringstream s(str);
         s >> cmd; 
         int i; 
-        GLfloat values[10]; // Position and color for light, colors for others
+        float values[10]; // Position and color for light, colors for others
         // Up to 10 params for cameras.  
         bool validinput; // Validity of input 
 
-        // Process the light, add it to database.
-        // Lighting Command
-        if (cmd == "light") {
-          if (numused == numLights) { // No more Lights 
-            cerr << "Reached Maximum Number of Lights " << numused << " Will ignore further lights\n";
-          } else {
-            validinput = readvals(s, 8, values); // Position/color for lts.
-            if (validinput) {
-
-              // YOUR CODE FOR HW 2 HERE.
-              // Note that values[0...7] shows the read in values 
-              // Make use of lightposn[] and lightcolor[] arrays in variables.h
-              // Those arrays can then be used in display too.
-
-              // Notes:
-              //  - command is light x y z w r g b a
-              //  - position in array based on which light is being processed
-              int valuesPerSet = 4;
-              int arrayOffset = valuesPerSet * numused;
-
-              for (i = 0; i < valuesPerSet; i++) {
-                // first 4 values are posn according to spec
-                lightposn[arrayOffset + i] = values[i];
-                // second 4 values are rgba according to spec
-                lightcolor[arrayOffset + i] = values[valuesPerSet + i];
-              }
-
-              ++numused;
-            }
-          }
-        }
-
-        // Material Commands 
+        // Material Commands
         // Ambient, diffuse, specular, shininess properties for each object.
         // Filling this in is pretty straightforward, so I've left it in 
         // the skeleton, also as a hint of how to do the more complex ones.
         // Note that no transforms/stacks are applied to the colors. 
 
-        else if (cmd == "ambient") {
-          validinput = readvals(s, 4, values); // colors 
+        if (cmd == "diffuse") {
+          validinput = readvals(s, 3, values, cmd);
           if (validinput) {
-            for (i = 0; i < 4; i++) {
-              ambient[i] = values[i]; 
-            }
-          }
-        } else if (cmd == "diffuse") {
-          validinput = readvals(s, 4, values); 
-          if (validinput) {
-            for (i = 0; i < 4; i++) {
+            for (i = 0; i < 3; i++) {
               diffuse[i] = values[i]; 
             }
           }
         } else if (cmd == "specular") {
-          validinput = readvals(s, 4, values); 
+          validinput = readvals(s, 3, values, cmd);
           if (validinput) {
-            for (i = 0; i < 4; i++) {
+            for (i = 0; i < 3; i++) {
               specular[i] = values[i]; 
             }
           }
         } else if (cmd == "emission") {
-          validinput = readvals(s, 4, values); 
+          validinput = readvals(s, 3, values, cmd);
           if (validinput) {
-            for (i = 0; i < 4; i++) {
+            for (i = 0; i < 3; i++) {
               emission[i] = values[i]; 
             }
           }
         } else if (cmd == "shininess") {
-          validinput = readvals(s, 1, values); 
+          validinput = readvals(s, 1, values, cmd);
           if (validinput) {
             shininess = values[0]; 
           }
-        } else if (cmd == "size") {
-          validinput = readvals(s,2,values); 
+        }
+
+        /*
+         * General Commands
+         */
+        else if (cmd == "size") {
+          validinput = readvals(s,2,values, cmd);
           if (validinput) { 
-            w = (int) values[0]; h = (int) values[1]; 
-          } 
-        } else if (cmd == "camera") {
-          validinput = readvals(s,10,values); // 10 values eye cen up fov
+            w = (int) values[0]; h = (int) values[1]; totalpixels = (int) w * h;
+          }
+        } else if (cmd == "maxdepth") {
+          validinput = readvals(s, 1, values, cmd);
+          if (validinput) {
+            maxdepth = values[0];
+          }
+        } else if (cmd == "output") {
+          s >> fname;
+          if (s.fail()) {
+            cout << "Failed reading value filename";
+          }
+        }
+
+        /*
+         * Camera Command(s)
+         */
+        else if (cmd == "camera") {
+          validinput = readvals(s,10, values, cmd); // 10 values eye cen up fov
           if (validinput) {
 
             // YOUR CODE FOR HW 2 HERE
             // Use all of values[0...9]
             // You may need to use the upvector fn in Transform.cpp
             // to set up correctly. 
-            // Set eyeinit upinit center fovy in variables.h
+            // Set eyeinit upinit spherecenter fovy in variables.h
 
             // Notes:
             //  - command fromm spec... camera lookfromx lookfromy lookcfromz lookatx lookaty lookatz upx upy upz fovy
             eyeinit = vec3(values[0], values[1], values[2]); // eye initial position
 
-            center = vec3(values[3], values[4], values[5]); // position of center/eye initial lookat position
+            center = vec3(values[3], values[4], values[5]); // position of spherecenter/eye initial lookat position
 
-            vec3 eyeDirection = center - eyeinit; // vector from eye position to center
+            vec3 eyeDirection = center - eyeinit; // vector from eye position to spherecenter
 
             upinit = Transform::upvector(
               normalize(vec3(values[6], values[7], values[8])),
@@ -201,45 +200,94 @@ void readfile(const char* filename)
           }
         }
 
-        // I've left the code for loading objects in the skeleton, so 
-        // you can get a sense of how this works.  
-        // Also look at demo.txt to get a sense of why things are done this way.
-        else if (cmd == "sphere" || cmd == "cube" || cmd == "teapot") {
-          if (numobjects == maxobjects) { // No more objects 
-            cerr << "Reached Maximum Number of Objects " << numobjects << " Will ignore further objects\n";
-          } else {
-            validinput = readvals(s, 1, values); 
-            if (validinput) {
-              object * obj = &(objects[numobjects]); 
-              obj->size = values[0]; 
-
-              // Set the object's light properties
-              for (i = 0; i < 4; i++) {
-                (obj->ambient)[i] = ambient[i]; 
-                (obj->diffuse)[i] = diffuse[i]; 
-                (obj->specular)[i] = specular[i]; 
-                (obj->emission)[i] = emission[i];
-              }
-              obj->shininess = shininess; 
-
-              // Set the object's transform
-              obj->transform = transfstack.top(); 
-
-              // Set the object's type
-              if (cmd == "sphere") {
-                obj->type = sphere; 
-              } else if (cmd == "cube") {
-                obj->type = cube; 
-              } else if (cmd == "teapot") {
-                obj->type = teapot; 
-              }
+        /*
+         * Lights Commands
+         */
+        else if (cmd == "directional") {
+          readlightvals(s, &lightsused, values, directional, cmd);
+        } else if (cmd == "point") {
+          readlightvals(s, &lightsused, values, point, cmd);
+        } else if (cmd == "attenuation") {
+          validinput = readvals(s, 3, values, cmd);
+          if (validinput) {
+            for (i = 0; i < 3; i++) {
+              attenuation[i] = values[i];
             }
-            ++numobjects; 
+          }
+        } else if (cmd == "ambient") {
+          validinput = readvals(s, 3, values, cmd); // colors
+          if (validinput) {
+            for (i = 0; i < 3; i++) {
+              ambient[i] = values[i];
+            }
           }
         }
 
+        /*
+         * Geometry Commands
+         */
+        // I've left the code for loading objects in the skeleton, so
+        // you can get a sense of how this works.  
+        // Also look at demo.txt to get a sense of why things are done this way.
+        else if (cmd == "sphere" || cmd == "cube" || cmd == "teapot" || cmd == "tri") {
+          if (numobjects == maxobjects) { // No more objects 
+            cerr << "Reached Maximum Number of Objects " << numobjects << " Will ignore further objects\n";
+          } else {
+            object * obj = &(objects[numobjects]);
+
+            // Set the object's light properties
+            for (i = 0; i < 3; i++) {
+              (obj->ambient)[i] = ambient[i];
+              (obj->diffuse)[i] = diffuse[i];
+              (obj->specular)[i] = specular[i];
+              (obj->emission)[i] = emission[i];
+            }
+            obj->shininess = shininess;
+
+            // Set the object's transform
+            obj->transform = transfstack.top();
+
+            // Set the object's type
+            if (cmd == "sphere") {
+              validinput = readvals(s, 4, values, cmd);
+              if (validinput) {
+                obj->type = sphere;
+                (obj->spherecenter)[0] = values[0];
+                (obj->spherecenter)[1] = values[1];
+                (obj->spherecenter)[2] = values[2];
+                obj->size = values[3];
+              }
+            } else if (cmd == "tri") {
+              validinput = readvals(s, 3, values, cmd);
+              if (validinput) {
+                obj->type = triangle;
+                obj->trianglevertices[0] = values[0];
+                obj->trianglevertices[1] = values[1];
+                obj->trianglevertices[2] = values[2];
+              }
+
+            }
+            ++numobjects; 
+          }
+        } else if (cmd == "maxverts") {
+          validinput = readvals(s, 1, values, cmd);
+          if (validinput) {
+            maxverts = values[0];
+          }
+        } else if (cmd == "vertex") {
+          validinput = readvals(s, 3, values, cmd);
+          if (validinput) {
+              vertices[verticesused] = vec3(values[0], values[1], values[2]);
+          }
+          verticesused++;
+        }
+
+        /*
+         * Transformation Commands
+         */
+
         else if (cmd == "translate") {
-          validinput = readvals(s,3,values); 
+          validinput = readvals(s,3,values, cmd);
           if (validinput) {
 
             // YOUR CODE FOR HW 2 HERE.  
@@ -251,7 +299,7 @@ void readfile(const char* filename)
           }
         }
         else if (cmd == "scale") {
-          validinput = readvals(s,3,values); 
+          validinput = readvals(s,3,values, cmd);
           if (validinput) {
 
             // YOUR CODE FOR HW 2 HERE.  
@@ -263,7 +311,7 @@ void readfile(const char* filename)
           }
         }
         else if (cmd == "rotate") {
-          validinput = readvals(s,4,values); 
+          validinput = readvals(s,4,values, cmd);
           if (validinput) {
 
             // YOUR CODE FOR HW 2 HERE. 
@@ -297,16 +345,14 @@ void readfile(const char* filename)
     }
 
     // Set up initial position for eye, up and amount
-    // As well as booleans 
+    // As well as booleans
 
     eye = eyeinit; 
     up = upinit; 
     amount = amountinit;
     sx = sy = 1.0;  // keyboard controlled scales in x and y 
     tx = ty = 0.0;  // keyboard controllled translation in x and y  
-    useGlu = false; // don't use the glu perspective/lookat fns
 
-    glEnable(GL_DEPTH_TEST);
   } else {
     cerr << "Unable to Open Input Data File " << filename << "\n"; 
     throw 2; 
