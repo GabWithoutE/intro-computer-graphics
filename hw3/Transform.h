@@ -14,8 +14,9 @@
 // Typedefs to make code more readable 
 
 typedef glm::mat3 mat3 ;
-typedef glm::mat4 mat4 ; 
-typedef glm::vec3 vec3 ; 
+typedef glm::mat4 mat4 ;
+typedef glm::vec2 vec2 ;
+typedef glm::vec3 vec3 ;
 typedef glm::vec4 vec4 ; 
 const float pi = 3.14159265 ; // For portability across platforms
 
