@@ -5,9 +5,11 @@
 
 // This is the basic include file for the global variables in the program.  
 // Since all files need access to it, we define EXTERN as either blank or 
-// extern, depending on if included in the main program or not.  
+// extern, depending on if included in the main program or not.
 
-#ifdef MAINPROGRAM 
+#include <string>
+
+#ifdef MAINPROGRAM
 #define EXTERN 
 #else 
 #define EXTERN extern 
@@ -35,7 +37,7 @@ EXTERN int amountinit;
 EXTERN int w, h, totalpixels ;
 EXTERN float fovy ; 
 EXTERN float maxdepth ;
-EXTERN string fname ;
+EXTERN std::string fname ;
 #endif
 
 EXTERN mat4 projection, modelview; // The mvp matrices
@@ -47,7 +49,7 @@ EXTERN float tx, ty ; // the translation in x and y
 
 // Lighting parameter array, similar to that in the fragment shader
 enum light {point, directional};
-const int numLights = 10 ; 
+const int numLights = 100 ;
 EXTERN float lightposn [3*numLights] ; // Light Positions
 EXTERN float lightcolor[3*numLights] ; // Light Colors
 EXTERN light lighttype[numLights] ;
@@ -57,10 +59,10 @@ EXTERN float attenuation[3] ;
 
 // Materials (read from file) 
 // With multiple objects, these are colors for each.
-EXTERN float ambient[4] ;
-EXTERN float diffuse[4] ;
-EXTERN float specular[4] ;
-EXTERN float emission[4] ;
+EXTERN float ambient[3] ;
+EXTERN float diffuse[3] ;
+EXTERN float specular[3] ;
+EXTERN float emission[3] ;
 EXTERN float shininess ;
 
 // Vertex Variables
@@ -79,10 +81,10 @@ EXTERN int numobjects ;
 EXTERN struct object {
   shape type ; 
   float size ;
-  float ambient[4] ;
-  float diffuse[4] ;
-  float specular[4] ;
-  float emission[4] ;
+  float ambient[3] ;
+  float diffuse[3] ;
+  float specular[3] ;
+  float emission[3] ;
   int trianglevertices[3] ;
   float spherecenter[3] ;
   float shininess ;

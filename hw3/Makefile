@@ -15,20 +15,22 @@ endif
 
 RM = /bin/rm -f 
 all: transforms
-transforms: main.o Transform.o readfile.o Sampler.o Ray.o Camera.o variables.h readfile.h Transform.h
-	$(CC) $(CFLAGS) -o transforms main.o Transform.o Sampler.o Ray.o Sampler.o readfile.o $(INCFLAGS) $(LDFLAGS)
-main.o: main.cpp Transform.h variables.h
+transforms: main.o Transform.o readfile.o Sampler.o Ray.o Camera.o Raytracer.o variables.h readfile.h Transform.h
+	$(CC) $(CFLAGS) -o transforms main.o Transform.o Sampler.o Ray.o Camera.o Raytracer.o readfile.o $(INCFLAGS) $(LDFLAGS)
+main.o: main.cpp Transform.h variables.h Sampler.h Ray.h Camera.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
 readfile.o: readfile.cpp readfile.h variables.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c readfile.cpp
 Transform.o: Transform.cpp Transform.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c Transform.cpp
-Sampler.o: Sampler.cpp Sampler.h
+Sampler.o: Sampler.cpp variables.h Sampler.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c Sampler.cpp
-Ray.o: Ray.cpp Ray.h
+Ray.o: Ray.cpp Ray.h Transform.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c Ray.cpp
-Camera.o: Camera.cpp Camera.h
+Camera.o: Camera.cpp Camera.h variables.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c Camera.cpp
+Raytracer.o: Raytracer.cpp Raytracer.h variables.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c Raytracer.cpp
 clean:
 	$(RM) *.o transforms *.png
 

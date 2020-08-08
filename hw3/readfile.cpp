@@ -86,7 +86,7 @@ void readlightvals(stringstream &s, int * numused, float * values, light type, s
 
     for (int i = 0; i < 3; i++) {
       lightposn[i + 3 * *numused] = values[i];
-      lightcolor[i + 3 * *numused] = values[i + 3];
+      lightcolor[i + 3 * *numused] = values[i + 3] * 255;
     }
   }
   (*numused)++;
@@ -140,7 +140,7 @@ void readfile(const char* filename)
           validinput = readvals(s, 3, values, cmd);
           if (validinput) {
             for (i = 0; i < 3; i++) {
-              emission[i] = values[i]; 
+              emission[i] = values[i] * 255;
             }
           }
         } else if (cmd == "shininess") {
@@ -218,7 +218,7 @@ void readfile(const char* filename)
           validinput = readvals(s, 3, values, cmd); // colors
           if (validinput) {
             for (i = 0; i < 3; i++) {
-              ambient[i] = values[i];
+              ambient[i] = values[i] * 255;
             }
           }
         }

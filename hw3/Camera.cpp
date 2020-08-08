@@ -7,13 +7,22 @@
 
 Ray Camera::createRay(vec2 virtualscreenpixel) {
   vec3 unitW = normalize(eye - center);
-  vec3 unitU = normalize(cross(up, unitW));
-  vec3 unitV = normalize(cross(unitW, unitV));
+  vec3 unitU = normalize(cross(unitW, up));
+  vec3 unitV = normalize(cross(unitW, unitU));
+  vec3 p1 = normalize(virtualscreenpixel.x * unitU + virtualscreenpixel.y * unitV - unitW);
+//  printf("unitW: %f, %f, %f\n", unitW.x, unitW.y, unitW.z);
+//  printf("unitU: %f, %f, %f\n", unitU.x, unitU.y, unitU.z);
+//  printf("unitV: %f, %f, %f\n", unitV.x, unitV.y, unitV.z);
+//  printf("p1: %f, %f, %f\n", p1.x, p1.y, p1.z);
 
-  return {
+  return Ray(
     virtualscreenpixel.x,
     virtualscreenpixel.y,
-    normalize(virtualscreenpixel.x * unitU + virtualscreenpixel.y * unitV - unitW),
+    p1,
     eye
-  };
+  );
+}
+
+Camera::Camera() {
+
 }

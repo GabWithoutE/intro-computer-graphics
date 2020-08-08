@@ -18,4 +18,4 @@ public:
   Ray(float deltaU, float deltaV, vec3 p1, vec3 p0);
 };
 
-#endif //HW3_RAY_H
+#endif

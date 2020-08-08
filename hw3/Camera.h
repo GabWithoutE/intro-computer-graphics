@@ -2,14 +2,12 @@
 // Created by Gabriel Chen on 8/6/20.
 //
 
-#ifndef HW3_CAMERA_H
-#define HW3_CAMERA_H
-
 #include "Ray.h"
 
 class Camera {
+public:
   static Ray createRay(vec2 virtualscreenpixel);
+  Camera();
 };
 
 
-#endif //HW3_CAMERA_H

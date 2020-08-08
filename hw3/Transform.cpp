@@ -9,7 +9,7 @@
 const mat3 identityMatrix = mat3(1, 0, 0, 0, 1, 0, 0, 0, 1);
 
 float toRadians(float degrees) {
-  return degrees * (pi / 180);
+  return degrees * (piConst / 180);
 }
 
 // Helper rotation function.  Please implement this.  
