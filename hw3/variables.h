@@ -88,10 +88,10 @@ EXTERN struct object {
   int trianglevertices[3] ;
   float spherecenter[3] ;
   float shininess ;
-  mat4 transform ; 
+  mat4 transform ;
 } objects[maxobjects] ;
 
-// Variables to set uniform params for lighting fragment shader 
+// Variables to set uniform params for lighting fragment shader
 EXTERN uint lightcol ;
 EXTERN uint lightpos ;
 EXTERN uint numusedcol ;

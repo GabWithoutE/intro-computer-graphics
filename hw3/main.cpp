@@ -22,7 +22,7 @@ using namespace std;
 #include "readfile.h" // prototypes for readfile.cpp
 #include "Camera.h"
 #include "Sampler.h"
-#include "Raytracer.h"
+#include "RaytracerA.h"
 
 void saveScreenshot(BYTE * pixels, string outputfilename) {
   FIBITMAP *img = FreeImage_ConvertFromRawBits(pixels, w, h, w * 3, 24, 0xFF0000, 0x00FF00, 0x0000FF, false);
@@ -54,10 +54,9 @@ int main(int argc, char* argv[]) {
 //  for (int i = 0; i < 1; i++) {
 //    for (int j = 0; j < 1; j++) {
       // restart the current depth for each pixel to avoid excessive recursive raytracing...
-      int currentdepth = 0;
       vec2 virtualscreenpoint = Sampler::pixelCoordToVirtualScreenPoint(i, j);
       Ray ray = Camera::createRay(virtualscreenpoint);
-      vec3 color = Raytracer::traceRay(ray, currentdepth);
+      vec3 color = RaytracerA::traceRay(ray);
       colors[i * w + j] = color;
     }
   }

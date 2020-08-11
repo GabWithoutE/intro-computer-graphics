@@ -24,7 +24,7 @@ specular 0 0 0
 
 # Now specify the geometry 
 # Again, for initial testing, maybe you want to implement a dummy 
-# ray-plane intersection routine, instead of reading this fully.
+# ray-plane SurfaceIntersectionInfo routine, instead of reading this fully.
 # Though it's probably simpler you just implement this, for later 
 # parts of the assignment.
 

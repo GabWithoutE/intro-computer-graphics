@@ -15,8 +15,8 @@ endif
 
 RM = /bin/rm -f 
 all: transforms
-transforms: main.o Transform.o readfile.o Sampler.o Ray.o Camera.o Raytracer.o variables.h readfile.h Transform.h
-	$(CC) $(CFLAGS) -o transforms main.o Transform.o Sampler.o Ray.o Camera.o Raytracer.o readfile.o $(INCFLAGS) $(LDFLAGS)
+transforms: main.o Transform.o readfile.o Sampler.o Ray.o Camera.o RaytracerA.o SurfaceIntersectionInfo.o variables.h readfile.h Transform.h
+	$(CC) $(CFLAGS) -o transforms main.o Transform.o Sampler.o Ray.o Camera.o SurfaceIntersectionInfo.o RaytracerA.o readfile.o $(INCFLAGS) $(LDFLAGS)
 main.o: main.cpp Transform.h variables.h Sampler.h Ray.h Camera.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
 readfile.o: readfile.cpp readfile.h variables.h
@@ -29,8 +29,10 @@ Ray.o: Ray.cpp Ray.h Transform.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c Ray.cpp
 Camera.o: Camera.cpp Camera.h variables.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c Camera.cpp
-Raytracer.o: Raytracer.cpp Raytracer.h variables.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c Raytracer.cpp
+RaytracerA.o: RaytracerA.cpp RaytracerA.h variables.h Camera.h SurfaceIntersectionInfo.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c RaytracerA.cpp
+SurfaceIntersectionInfo.o: SurfaceIntersectionInfo.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c SurfaceIntersectionInfo.cpp
 clean:
 	$(RM) *.o transforms *.png
 
